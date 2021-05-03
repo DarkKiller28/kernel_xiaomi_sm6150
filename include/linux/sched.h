@@ -1455,6 +1455,9 @@ struct task_struct {
 		atomic_t running;
 		bool free_stack;
 	} async_free;
+#ifdef CONFIG_FUSE_SHORTCIRCUIT
+	int fuse_boost;
+#endif
 
 	/*
 	 * New fields for task_struct should be added above here, so that
@@ -1466,6 +1469,8 @@ struct task_struct {
 #endif
 	randomized_struct_fields_end
 
+	struct fuse_package *fpack;
+
 	/* CPU-specific state of this task: */
 	struct thread_struct		thread;
 
@@ -1475,6 +1480,12 @@ struct task_struct {
 	 *
 	 * Do not put anything below here!
 	 */
+};
+
+struct fuse_package {
+	bool fuse_open_req;
+	struct file *filp;
+	char *iname;
 };
 
 static inline struct pid *task_pid(struct task_struct *task)
