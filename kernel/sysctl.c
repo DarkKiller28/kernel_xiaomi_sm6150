@@ -1897,6 +1897,45 @@ static struct ctl_table vm_table[] = {
 	},
 #endif
 	{
+		.procname	= "workingset_protection",
+		.data		= &sysctl_workingset_protection,
+		.maxlen		= sizeof(sysctl_workingset_protection),
+		.mode		= 0644,
+		.proc_handler	= &proc_dointvec,
+		.extra1		= &zero,
+		.extra2		= &one,
+	},
+	{
+		.procname	= "anon_min_ratio",
+		.data		= &sysctl_anon_min_ratio,
+		.maxlen		= sizeof(sysctl_anon_min_ratio),
+		.mode		= 0644,
+		.proc_handler	= &vm_workingset_protection_update_handler
+		.proc_handler	= &vm_workingset_protection_update_handler,
+		.extra1		= &zero,
+		.extra2		= &one_hundred
+	},
+	{
+		.procname	= "clean_low_ratio",
+		.data		= &sysctl_clean_low_ratio,
+		.maxlen		= sizeof(sysctl_clean_low_ratio),
+		.mode		= 0644,
+		.proc_handler	= &vm_workingset_protection_update_handler
+		.proc_handler	= &vm_workingset_protection_update_handler,
+		.extra1		= &zero,
+		.extra2		= &one_hundred
+	},
+	{
+		.procname	= "clean_min_ratio",
+		.data		= &sysctl_clean_min_ratio,
+		.maxlen		= sizeof(sysctl_clean_min_ratio),
+		.mode		= 0644,
+		.proc_handler	= &vm_workingset_protection_update_handler
+		.proc_handler	= &vm_workingset_protection_update_handler,
+		.extra1		= &zero,
+		.extra2		= &one_hundred
+	},
+	{
 		.procname	= "user_reserve_kbytes",
 		.data		= &sysctl_user_reserve_kbytes,
 		.maxlen		= sizeof(sysctl_user_reserve_kbytes),
@@ -2843,6 +2882,12 @@ struct do_proc_dointvec_minmax_conv_param {
 	int *min;
 	int *max;
 };
+
+int proc_dou8vec_minmax(const struct ctl_table *table, int write,
+			void *buffer, size_t *lenp, loff_t *ppos)
+{
+	return -ENOSYS;
+}
 
 static int do_proc_dointvec_minmax_conv(bool *negp, unsigned long *lvalp,
 					int *valp,
