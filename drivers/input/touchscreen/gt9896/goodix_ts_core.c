@@ -1529,10 +1529,6 @@ static int goodix_ts_gpio_setup(struct goodix_ts_core *core_data)
 {
 	struct goodix_ts_board_data *ts_bdata = board_data(core_data);
 	int r = 0;
-<<<<<<< HEAD
-=======
-
->>>>>>> parent of 512861ac9843 (drivers: input: fingerprint: touchscreen: Use qcom msm drm notifier)
 	/*
 	 * after kenerl3.13, gpio_ api is deprecated, new
 	 * driver should use gpiod_ api.
@@ -3191,11 +3187,6 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	i2c_set_clientdata(client, core_data);
 
 	r = goodix_ts_power_init(core_data);
-	if (r < 0)
-		goto out;
-
-	/* get GPIO resource */
-	r = goodix_ts_gpio_setup(core_data);
 	if (r < 0)
 		goto out;
 
