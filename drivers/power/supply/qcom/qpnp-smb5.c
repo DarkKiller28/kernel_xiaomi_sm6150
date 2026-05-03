@@ -2410,6 +2410,28 @@ static int smb5_batt_get_prop(struct power_supply *psy,
 		rc = smblib_get_prop_from_bms(chg,
 				 POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN, val);
 		break;
+	case POWER_SUPPLY_PROP_TYPEC_MODE:
+		if (chg->connector_type == POWER_SUPPLY_CONNECTOR_MICRO_USB)
+			val->intval = POWER_SUPPLY_TYPEC_NONE;
+		else
+			val->intval = chg->typec_mode;
+		break;
+	case POWER_SUPPLY_PROP_TYPEC_POWER_ROLE:
+		if (chg->connector_type == POWER_SUPPLY_CONNECTOR_MICRO_USB)
+			val->intval = POWER_SUPPLY_TYPEC_PR_NONE;
+		else
+			rc = smblib_get_prop_typec_power_role(chg, val);
+		break;
+	case POWER_SUPPLY_PROP_TYPEC_CC_ORIENTATION:
+		if (chg->connector_type == POWER_SUPPLY_CONNECTOR_MICRO_USB)
+			val->intval = 0;
+		else
+			rc = smblib_get_prop_typec_cc_orientation(chg, val);
+		break;
+	case POWER_SUPPLY_PROP_DEBUG_BATTERY:
+		rc = smblib_get_prop_from_bms(chg,
+				POWER_SUPPLY_PROP_DEBUG_BATTERY, val);
+		break;
 	default:
 		pr_err("batt power supply prop %d not supported\n", psp);
 		return -EINVAL;
@@ -2564,6 +2586,9 @@ static int smb5_batt_set_prop(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		rc = smblib_set_prop_system_temp_level(chg, val);
+		break;
+	case POWER_SUPPLY_PROP_DEBUG_BATTERY:
+		/* QG/FG notifies when a debug battery ID is detected */
 		break;
 	default:
 		rc = -EINVAL;

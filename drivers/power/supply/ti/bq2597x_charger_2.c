@@ -2598,13 +2598,12 @@ static int bq2597x_suspend(struct device *dev)
 
 static int bq2597x_suspend_noirq(struct device *dev)
 {
-	struct i2c_client *client = to_i2c_client(dev);
-	struct bq2597x *bq = i2c_get_clientdata(client);
-
-	if (bq->irq_waiting) {
-		pr_err_ratelimited("Aborting suspend, an interrupt was detected while suspending\n");
-		return -EBUSY;
-	}
+	/*
+	 * Charger IRQs can assert during suspend (especially near empty battery).
+	 * The handler disables the line and sets irq_waiting; resume replays it.
+	 * Failing suspend here aborts system sleep — allow suspend and defer.
+	 */
+	(void)dev;
 	return 0;
 }
 

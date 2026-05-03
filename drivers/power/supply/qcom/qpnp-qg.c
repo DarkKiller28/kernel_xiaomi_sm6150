@@ -2726,7 +2726,8 @@ static int qg_charge_full_update(struct qpnp_qg *chip)
 	rc = power_supply_get_property(chip->batt_psy,
 			POWER_SUPPLY_PROP_RECHARGE_SOC, &prop);
 	if (rc < 0 || prop.intval < 0) {
-		pr_err("Failed to get recharge-soc\n");
+		pr_debug("QG: recharge-soc unavailable (rc=%d), using default threshold\n",
+			 rc);
 		if (batt_temp < BATT_QG_COLD_THRESHOLD)
 			recharge_soc = COLD_RECHARGE_SOC;
 		else

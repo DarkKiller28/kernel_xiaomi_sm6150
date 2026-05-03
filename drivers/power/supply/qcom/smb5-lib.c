@@ -1667,7 +1667,9 @@ void smblib_suspend_on_debug_battery(struct smb_charger *chg)
 	rc = smblib_get_prop_from_bms(chg,
 			POWER_SUPPLY_PROP_DEBUG_BATTERY, &val);
 	if (rc < 0) {
-		smblib_err(chg, "Couldn't get debug battery prop rc=%d\n", rc);
+		if (rc != -EINVAL && rc != -ENODEV)
+			smblib_err(chg, "Couldn't get debug battery prop rc=%d\n",
+				   rc);
 		return;
 	}
 	if (chg->suspend_input_on_debug_batt) {

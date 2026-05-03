@@ -1074,7 +1074,7 @@ static void init_sched_groups_energy(int cpu, struct sched_domain *sd,
 	}
 
 	if (sd->child && !sd->child->groups->sge) {
-		pr_err("BUG: EAS setup borken for CPU%d\n", cpu);
+		pr_err("BUG: EAS setup broken for CPU%d\n", cpu);
 #ifdef CONFIG_SCHED_DEBUG
 		pr_err("     energy data on %s but not on %s domain\n",
 			sd->name, sd->child->name);
@@ -1869,7 +1869,7 @@ static struct sched_domain *build_sched_domain(struct sched_domain_topology_leve
 
 		if (!cpumask_subset(sched_domain_span(child),
 				    sched_domain_span(sd))) {
-			pr_err("BUG: arch topology borken\n");
+			pr_err("BUG: arch topology broken\n");
 #ifdef CONFIG_SCHED_DEBUG
 			pr_err("     the %s domain not a subset of the %s domain\n",
 					child->name, sd->name);
@@ -1930,12 +1930,15 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 		}
 	}
 
-	/* Calculate CPU capacity for physical packages and nodes */
-	for (i = nr_cpumask_bits-1; i >= 0; i--) {
+	/*
+	 * Energy must be attached leaf-to-root per CPU, but parent domains also
+	 * require the child's sched_group_energy to exist first. The MC/DIE
+	 * balance CPU is often the lowest-numbered CPU in the group; iterating
+	 * high-to-low could initialize DIE before that CPU has populated MC,
+	 * triggering "EAS setup broken". Iterate in ascending CPU order.
+	 */
+	for_each_cpu(i, cpu_map) {
 		struct sched_domain_topology_level *tl = sched_domain_topology;
-
-		if (!cpumask_test_cpu(i, cpu_map))
-			continue;
 
 		for (sd = *per_cpu_ptr(d.sd, i); sd; sd = sd->parent, tl++) {
 			init_sched_groups_energy(i, sd, tl->energy);
